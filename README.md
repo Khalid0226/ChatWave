@@ -81,3 +81,58 @@ ChatWave/
 │   └── package.json              # Backend dependencies & scripts
 │
 └── .gitignore                    # Global ignore list (Node modules, env files, build artifacts)
+
+
+⚙️ Getting Started & Installation
+To run this repository locally on your machine, follow these step-by-step instructions.
+
+Prerequisites
+Ensure you have the following installed on your system:
+
+Node.js (v18.x or higher recommended)
+
+Git
+
+1. Clone the Repository
+Bash
+git clone [https://github.com/Khalid0226/ChatWave.git](https://github.com/Khalid0226/ChatWave.git)
+cd ChatWave
+2. Frontend Configuration & Execution
+Bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+3. Backend Configuration & Execution
+Bash
+# Navigate to backend directory from root
+cd ../backend
+
+# Install dependencies
+npm install
+
+# Create a .env file based on the required schema
+# PORT=5000
+# MONGO_URI=your_mongodb_connection_string
+# JWT_SECRET=your_jwt_secret_key
+
+# Run development server
+npm run dev
+🗺️ Roadmap & Future Enhancements
+[ ] End-to-End (E2E) Message Encryption
+
+[ ] Group Messaging & Channel Management
+
+[ ] Media Sharing (Images, Documents, and Voice Notes)
+
+[ ] Message Read Receipts (Double blue ticks)
+
+👨‍💻 Author
+Developed and maintained with passion by Pintu.
+
+📄 License
+Distributed under the MIT License. See LICENSE for more information.
