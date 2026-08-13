@@ -1,7 +1,8 @@
 import React from 'react';
 import { MessageSquare, ShieldCheck, Zap, Radio, Lock, ArrowRight, Search, MoreVertical, Smile, Paperclip, Send } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 function Landing({ onGetStarted }) {
+  const navigate =  useNavigate()
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950 text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-gray-950">
       
@@ -17,13 +18,13 @@ function Landing({ onGetStarted }) {
         </div>
         <div className="flex items-center space-x-4">
           <button 
-            onClick={onGetStarted}
+            onClick={()=>navigate('/login')}
             className="text-sm font-medium text-gray-300 hover:text-white transition cursor-pointer hidden sm:block"
           >
             Sign In
           </button>
           <button 
-            onClick={onGetStarted}
+            onClick={()=>navigate('/signup')}
             className="bg-emerald-500 hover:bg-emerald-400 text-gray-950 px-5 py-2.5 rounded-xl font-semibold transition duration-200 cursor-pointer shadow-lg shadow-emerald-500/25 active:scale-95"
           >
             Get Started
