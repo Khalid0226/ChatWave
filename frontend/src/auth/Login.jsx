@@ -31,6 +31,7 @@ function Login({ onSwitchToSignup, onSuccess }) {
         onSuccess(formData);
       } else {
         alert('Login Successful! (Frontend Mock)');
+        navigate('/dashboard')
       }
     }, 1000);
   };
