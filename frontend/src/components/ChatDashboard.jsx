@@ -31,7 +31,7 @@ function ChatDashboard({ user, onLogout }) {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#050811] text-white flex overflow-hidden selection:bg-emerald-500 selection:text-slate-950">
+    <div className="h-[100dvh] w-screen bg-[#050811] text-white flex overflow-hidden selection:bg-emerald-500 selection:text-slate-950">
       
       {/* Sidebar - Chat List (Mobile par selectedChat hone par hide ho jayegi, desktop par hamesha dikhegi) */}
       <div className={`w-full md:w-80 lg:w-96 bg-slate-900/40 border-r border-slate-800/80 flex flex-col backdrop-blur-xl ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
