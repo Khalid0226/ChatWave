@@ -5,6 +5,7 @@ import Landing from './components/Landing'
 import Signup from './auth/Signup'
 import Login from './auth/Login'
 import ChatDashboard from './components/ChatDashboard'
+import ProfileModal from './components/ProfileModal'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path='/signup' element={<Signup />}></Route>
         <Route path='/login' element={<Login />}/>
         <Route path='/dashboard' element={<ChatDashboard />}/>
+        <Route path='/profile' element={<ProfileModal />}/>
       </Routes>
     </div>
   )
