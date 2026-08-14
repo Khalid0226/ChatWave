@@ -6,20 +6,22 @@ import {
   Globe, HelpCircle, User, Plus
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
+import ProfileModal from './ProfileModal';
 
 function ChatDashboard({ user, onLogout }) {
   const [selectedChat, setSelectedChat] = useState(null);
   const [messageText, setMessageText] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [activeNav, setActiveNav] = useState('chats'); // 'chats', 'status', 'communities', 'settings', 'profile'
+  const [activeNav, setActiveNav] = useState('chats'); // 'chats', 'status', 'communities', 'settings'
   
+  // Profile Modal State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   // Mobile 3-dot dropdown menu state
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 
-  // Profile editable states
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingAbout, setIsEditingAbout] = useState(false);
+  // Profile states
   const [name, setName] = useState(user?.name || 'Pintu Kumar');
   const [about, setAbout] = useState('Full-stack MERN Developer & Tech Enthusiast 🚀');
   const [phone, setPhone] = useState('+91 98765 43210');
@@ -107,7 +109,7 @@ function ChatDashboard({ user, onLogout }) {
           </button>
           
           <div 
-            onClick={() => setActiveNav('profile')}
+            onClick={() => setShowProfileModal(true)}
             className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-bold cursor-pointer shadow-lg shadow-emerald-500/20 hover:scale-105 transition"
             title="Profile"
           >
@@ -119,76 +121,7 @@ function ChatDashboard({ user, onLogout }) {
       {/* Main Content Layout Wrapper */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
-        {/* 1. Profile Screen View */}
-        {activeNav === 'profile' && (
-          <div className="absolute inset-0 md:relative md:w-80 lg:w-96 bg-slate-900 md:border-r border-slate-800 z-30 flex flex-col text-white shadow-2xl transition-all h-full">
-            <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">
-              <button 
-                onClick={() => setActiveNav('chats')}
-                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/50 transition cursor-pointer"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h3 className="text-sm font-bold tracking-tight">Profile</h3>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-4 pb-6">
-              <div className="flex flex-col items-center py-6 bg-slate-900/40">
-                <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-3xl shadow-xl shadow-emerald-500/20">
-                  {name.charAt(0).toUpperCase()}
-                </div>
-              </div>
-
-              <div className="bg-slate-950/40 px-6 py-4 border-y border-slate-800/60">
-                <p className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider mb-1">Your name</p>
-                <div className="flex items-center justify-between">
-                  {isEditingName ? (
-                    <input 
-                      type="text" 
-                      value={name} 
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-slate-900 border border-emerald-500 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
-                      autoFocus
-                    />
-                  ) : (
-                    <span className="text-xs font-medium text-slate-200">{name}</span>
-                  )}
-                  <button 
-                    onClick={() => setIsEditingName(!isEditingName)}
-                    className="p-2 text-slate-400 hover:text-emerald-400 transition cursor-pointer ml-2"
-                  >
-                    {isEditingName ? <Check className="w-4 h-4 text-emerald-400" /> : <Edit2 className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-slate-950/40 px-6 py-4 border-y border-slate-800/60">
-                <p className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider mb-1">About</p>
-                <div className="flex items-center justify-between">
-                  {isEditingAbout ? (
-                    <input 
-                      type="text" 
-                      value={about} 
-                      onChange={(e) => setAbout(e.target.value)}
-                      className="w-full bg-slate-900 border border-emerald-500 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
-                      autoFocus
-                    />
-                  ) : (
-                    <span className="text-xs font-medium text-slate-200">{about}</span>
-                  )}
-                  <button 
-                    onClick={() => setIsEditingAbout(!isEditingAbout)}
-                    className="p-2 text-slate-400 hover:text-emerald-400 transition cursor-pointer ml-2"
-                  >
-                    {isEditingAbout ? <Check className="w-4 h-4 text-emerald-400" /> : <Edit2 className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 2. Status Screen View */}
+        {/* 1. Status Screen View */}
         {activeNav === 'status' && (
           <div className="absolute inset-0 md:relative md:w-80 lg:w-96 bg-slate-900 md:border-r border-slate-800 z-30 flex flex-col text-white shadow-2xl transition-all h-full">
             <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">
@@ -208,7 +141,7 @@ function ChatDashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* 3. Communities Screen View */}
+        {/* 2. Communities Screen View */}
         {activeNav === 'communities' && (
           <div className="absolute inset-0 md:relative md:w-80 lg:w-96 bg-slate-900 md:border-r border-slate-800 z-30 flex flex-col text-white shadow-2xl transition-all h-full">
             <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">
@@ -225,16 +158,19 @@ function ChatDashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* 4. Settings Screen View */}
+        {/* 3. Settings Screen View */}
         {activeNav === 'settings' && (
           <div className="absolute inset-0 md:relative md:w-80 lg:w-96 bg-slate-900 md:border-r border-slate-800 z-30 flex flex-col text-white shadow-2xl transition-all h-full">
             <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">
               <h3 className="text-base font-bold tracking-tight">Settings</h3>
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              <div className="flex items-center gap-4 px-4 py-3 hover:bg-slate-800/40 rounded-xl cursor-pointer text-xs text-slate-300">
+              <div 
+                onClick={() => setShowProfileModal(true)}
+                className="flex items-center gap-4 px-4 py-3 hover:bg-slate-800/40 rounded-xl cursor-pointer text-xs text-slate-300"
+              >
                 <User className="w-4 h-4 text-emerald-400" />
-                <span>Account Preferences</span>
+                <span>Profile Settings</span>
               </div>
               <div className="flex items-center gap-4 px-4 py-3 hover:bg-slate-800/40 rounded-xl cursor-pointer text-xs text-slate-300">
                 <Lock className="w-4 h-4 text-emerald-400" />
@@ -266,7 +202,7 @@ function ChatDashboard({ user, onLogout }) {
                   {showMenuDropdown && (
                     <div className="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50 text-xs">
                       <button 
-                        onClick={() => { setActiveNav('profile'); setShowMenuDropdown(false); }}
+                        onClick={() => { setShowProfileModal(true); setShowMenuDropdown(false); }}
                         className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
                       >
                         <User className="w-4 h-4 text-emerald-400" /> Profile
@@ -471,7 +407,7 @@ function ChatDashboard({ user, onLogout }) {
 
       </div>
 
-      {/* WhatsApp-style Mobile Bottom Navigation Bar (Visible on mobile only when NOT inside a chat and activeNav is not a sub-screen) */}
+      {/* WhatsApp-style Mobile Bottom Navigation Bar */}
       {!selectedChat && (
         <div className="md:hidden absolute bottom-0 left-0 right-0 h-16 bg-slate-950 border-t border-slate-800/80 flex items-center justify-around z-30 px-2">
           <button 
@@ -506,6 +442,20 @@ function ChatDashboard({ user, onLogout }) {
             <span className="text-[10px] font-medium">Settings</span>
           </button>
         </div>
+      )}
+
+      {/* Profile Modal Integration */}
+      {showProfileModal && (
+        <ProfileModal 
+          isOpen={showProfileModal} 
+          onClose={() => setShowProfileModal(false)}
+          userData={{ name, about, phone }}
+          onUpdateProfile={(updatedData) => {
+            if (updatedData.name) setName(updatedData.name);
+            if (updatedData.about) setAbout(updatedData.about);
+            if (updatedData.phone) setPhone(updatedData.phone);
+          }}
+        />
       )}
 
     </div>

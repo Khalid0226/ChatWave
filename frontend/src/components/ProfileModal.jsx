@@ -6,7 +6,7 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   
   const [name, setName] = useState(user?.name || 'Pintu Kumar');
-  const [about, setAbout] = useState('Full-stack MERN Developer & Tech Enthusiast 🚀');
+  const [about, setAbout] = useState(user?.about || 'Full-stack MERN Developer & Tech Enthusiast 🚀');
   const [phone, setPhone] = useState('+91 98765 43210');
 
   return (
@@ -87,7 +87,12 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
             )}
             
             <button 
-              onClick={() => setIsEditingAbout(!isEditingAbout)}
+              onClick={() => {
+                if (isEditingAbout && onUpdateProfile) {
+                  onUpdateProfile({ name, about });
+                }
+                setIsEditingAbout(!isEditingAbout);
+              }}
               className="p-2 text-slate-400 hover:text-emerald-400 transition cursor-pointer ml-2"
             >
               {isEditingAbout ? <Check className="w-4 h-4 text-emerald-400" /> : <Edit2 className="w-4 h-4" />}
