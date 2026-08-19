@@ -33,12 +33,13 @@ function StatusView({ currentUser, statuses, onAddStatus, onBack }) {
         {/* Main Card Container */}
         <div className="w-full h-full md:h-[88vh] md:max-w-2xl bg-slate-900 md:border border-slate-800 md:rounded-2xl flex flex-col shadow-2xl overflow-hidden relative">
           
-          {/* Header (Ab yahan desktop aur mobile dono par Back Button dikhega) */}
+          {/* Header */}
           <div className="h-16 bg-slate-950/80 px-4 md:px-6 flex items-center justify-between border-b border-slate-800 shrink-0 backdrop-blur-xl">
             <div className="flex items-center gap-3">
+              {/* Back button sirf Desktop (md) par dikhega, mobile par hidden rahega */}
               <button 
                 onClick={onBack}
-                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/50 transition cursor-pointer"
+                className="hidden md:flex p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/50 transition cursor-pointer items-center justify-center"
                 title="Go Back"
               >
                 <ArrowLeft className="w-5 h-5" />

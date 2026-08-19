@@ -22,9 +22,11 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
           
           {/* Header */}
           <div className="h-16 bg-slate-950/80 px-4 md:px-6 flex items-center gap-4 border-b border-slate-800 shrink-0 backdrop-blur-xl">
+            {/* Back button sirf Desktop (md) par dikhega, mobile par hidden rahega */}
             <button 
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/50 transition cursor-pointer"
+              className="hidden md:flex p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/50 transition cursor-pointer items-center justify-center"
+              title="Go Back"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -32,7 +34,7 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
           </div>
 
           {/* Scrollable Body (Custom scrollbar taaki ganda scrollbar na dikhe) */}
-          <div className="flex-1 overflow-y-auto space-y-4 pb-20 md:pb-6">
+          <div className="flex-1 overflow-y-auto space-y-4 pb-20 md:pb-6 custom-scrollbar">
             
             {/* Avatar Section */}
             <div className="flex flex-col items-center py-6 bg-slate-950/30 border-b border-slate-800/60">
