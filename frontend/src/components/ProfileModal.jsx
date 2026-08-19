@@ -7,10 +7,11 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
   
   const [name, setName] = useState(user?.name || 'Pintu Kumar');
   const [about, setAbout] = useState(user?.about || 'Full-stack MERN Developer & Tech Enthusiast 🚀');
-  const [phone, setPhone] = useState('+91 98765 43210');
+  const [phone] = useState(user?.phone || '+91 98765 43210');
 
   return (
-    <div className="absolute inset-y-0 left-0 w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 z-50 flex flex-col text-white shadow-2xl transition-all duration-300">
+    // Yahan absolute ki jagah w-full max-w-xl h-full md:h-[90vh] md:rounded-2xl use kar liya hai taaki blank screen na aaye
+    <div className="w-full h-full md:max-w-2xl lg:max-w-3xl md:h-[90vh] md:rounded-2xl bg-slate-900 md:border border-slate-800 flex flex-col text-white shadow-2xl transition-all duration-300 overflow-hidden">
       
       {/* Header */}
       <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">

@@ -1,30 +1,25 @@
 import React, { useState } from 'react';
-import { 
-  MessageSquare, Search, Send, Phone, Video, MoreVertical, 
-  Smile, Paperclip, CheckCheck, LogOut, ArrowLeft, X, 
-  CircleDot, Users, Settings, Bell, Lock, Camera, Edit2, Check, 
-  Globe, HelpCircle, User, Plus
+import { useNavigate } from 'react-router-dom'; // <-- React Router hook
+import {
+  MessageSquare, Search, Send, Phone, Video, MoreVertical,
+  Smile, Paperclip, CheckCheck, LogOut, ArrowLeft, X,
+  CircleDot, Users, Settings, Lock, User
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
-import ProfileModal from './ProfileModal';
 
 function ChatDashboard({ user, onLogout }) {
+  const navigate = useNavigate(); // <-- Initialize navigate
+
   const [selectedChat, setSelectedChat] = useState(null);
   const [messageText, setMessageText] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [activeNav, setActiveNav] = useState('chats'); // 'chats', 'status', 'communities', 'settings'
-  
-  // Profile Modal State
-  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Mobile 3-dot dropdown menu state
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 
   // Profile states
-  const [name, setName] = useState(user?.name || 'Pintu Kumar');
-  const [about, setAbout] = useState('Full-stack MERN Developer & Tech Enthusiast 🚀');
-  const [phone, setPhone] = useState('+91 98765 43210');
+  const [name] = useState(user?.name || 'Pintu Kumar');
 
   const [messages, setMessages] = useState([
     { id: 1, sender: 'them', text: 'Hey Pintu! Kaise ho? ChatWave ka frontend kaisa chal raha hai?', time: '10:30 AM' },
@@ -35,16 +30,6 @@ function ChatDashboard({ user, onLogout }) {
     { id: 1, name: 'Rahul Sharma', lastMsg: 'Ekdum mast chal raha hai!', time: '10:32 AM', avatar: 'RS', online: true },
     { id: 2, name: 'Priya Verma', lastMsg: 'Kal college milte hain.', time: 'Yesterday', avatar: 'PV', online: false },
     { id: 3, name: 'Web Dev Group', lastMsg: 'Meeting link bhej diya hai.', time: 'Monday', avatar: 'WD', online: true }
-  ];
-
-  const statuses = [
-    { id: 1, name: 'Rahul Sharma', time: 'Today at 9:15 AM', avatar: 'RS' },
-    { id: 2, name: 'Priya Verma', time: 'Yesterday at 8:45 PM', avatar: 'PV' }
-  ];
-
-  const communities = [
-    { id: 1, name: 'MERN Stack Developers India', members: '345 members', desc: 'Discussing React, Node, and Tailwind CSS tricks.' },
-    { id: 2, name: 'College Official Group', members: '1,200 members', desc: 'Official announcements and assignments.' }
   ];
 
   const handleSendMessage = (e) => {
@@ -73,26 +58,26 @@ function ChatDashboard({ user, onLogout }) {
   return (
     <div className="h-[100dvh] w-screen bg-[#050811] text-white flex flex-col md:flex-row overflow-hidden selection:bg-emerald-500 selection:text-slate-950 relative">
 
-      {/* Desktop Rail / Sidebar (Hidden on Mobile screens) */}
+      {/* Desktop Rail / Sidebar */}
       <div className="hidden md:flex w-16 bg-slate-950 border-r border-slate-800/80 flex-col items-center py-4 justify-between z-30 shrink-0">
         <div className="flex flex-col items-center gap-4">
-          <button 
-            onClick={() => setActiveNav('chats')}
-            className={`p-3 rounded-xl transition cursor-pointer ${activeNav === 'chats' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+          <button
+            onClick={() => navigate('/')}
+            className="p-3 rounded-xl transition cursor-pointer bg-emerald-500/20 text-emerald-400"
             title="Chats"
           >
             <MessageSquare className="w-5 h-5" />
           </button>
-          <button 
-            onClick={() => setActiveNav('status')}
-            className={`p-3 rounded-xl transition cursor-pointer ${activeNav === 'status' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+          <button
+            onClick={() => navigate('/status')}
+            className="p-3 rounded-xl transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-800/50"
             title="Status"
           >
             <CircleDot className="w-5 h-5" />
           </button>
-          <button 
-            onClick={() => setActiveNav('communities')}
-            className={`p-3 rounded-xl transition cursor-pointer ${activeNav === 'communities' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+          <button
+            onClick={() => navigate('/communities')}
+            className="p-3 rounded-xl transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-800/50"
             title="Communities"
           >
             <Users className="w-5 h-5" />
@@ -100,16 +85,16 @@ function ChatDashboard({ user, onLogout }) {
         </div>
 
         <div className="flex flex-col items-center gap-3">
-          <button 
-            onClick={() => setActiveNav('settings')}
-            className={`p-3 rounded-xl transition cursor-pointer ${activeNav === 'settings' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+          <button
+            onClick={() => navigate('/settings')}
+            className="p-3 rounded-xl transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-800/50"
             title="Settings"
           >
             <Settings className="w-5 h-5" />
           </button>
-          
-          <div 
-            onClick={() => setShowProfileModal(true)}
+
+          <div
+            onClick={() => navigate('/profile')}
             className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-bold cursor-pointer shadow-lg shadow-emerald-500/20 hover:scale-105 transition"
             title="Profile"
           >
@@ -121,162 +106,99 @@ function ChatDashboard({ user, onLogout }) {
       {/* Main Content Layout Wrapper */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
-        {/* 1. Status Screen View */}
-        {activeNav === 'status' && (
-          <div className="absolute inset-0 md:relative md:w-80 lg:w-96 bg-slate-900 md:border-r border-slate-800 z-30 flex flex-col text-white shadow-2xl transition-all h-full">
-            <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">
-              <h3 className="text-base font-bold tracking-tight">Status Updates</h3>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {statuses.map(s => (
-                <div key={s.id} className="flex items-center gap-3 p-3 bg-slate-950/40 border border-slate-800/60 rounded-xl">
-                  <div className="w-10 h-10 rounded-full border-2 border-emerald-500 flex items-center justify-center font-bold text-emerald-400 bg-slate-800">{s.avatar}</div>
-                  <div>
-                    <h4 className="text-xs font-bold">{s.name}</h4>
-                    <p className="text-[10px] text-slate-400">{s.time}</p>
+        {/* Chats List Sidebar */}
+        <div className={`w-full md:w-80 lg:w-96 bg-slate-900/40 border-r border-slate-800/80 flex flex-col backdrop-blur-xl ${selectedChat ? 'hidden md:flex' : 'flex'} flex-1 md:flex-initial pb-16 md:pb-0`}>
+
+          {/* Chats Header with Mobile 3-Dot Menu */}
+          <div className="p-4 border-b border-slate-800/80 flex items-center justify-between relative">
+            <h3 className="text-base font-bold tracking-tight text-emerald-400">ChatWave</h3>
+
+            <div className="flex items-center gap-2">
+              <div className="relative md:hidden">
+                <button
+                  onClick={() => setShowMenuDropdown(!showMenuDropdown)}
+                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/50 transition cursor-pointer"
+                >
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+
+                {showMenuDropdown && (
+                  <div className="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50 text-xs">
+                    <button
+                      onClick={() => { navigate('/profile'); setShowMenuDropdown(false); }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
+                    >
+                      <User className="w-4 h-4 text-emerald-400" /> Profile
+                    </button>
+                    <button
+                      onClick={() => { navigate('/settings'); setShowMenuDropdown(false); }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
+                    >
+                      <Settings className="w-4 h-4 text-emerald-400" /> Settings
+                    </button>
+                    <div className="border-t border-slate-800 my-1"></div>
+                    <button
+                      onClick={() => { setShowMenuDropdown(false); onLogout(); }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-red-400 flex items-center gap-2 font-medium"
+                    >
+                      <LogOut className="w-4 h-4" /> Logout
+                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                )}
+              </div>
 
-        {/* 2. Communities Screen View */}
-        {activeNav === 'communities' && (
-          <div className="absolute inset-0 md:relative md:w-80 lg:w-96 bg-slate-900 md:border-r border-slate-800 z-30 flex flex-col text-white shadow-2xl transition-all h-full">
-            <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">
-              <h3 className="text-base font-bold tracking-tight">Communities</h3>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {communities.map(c => (
-                <div key={c.id} className="p-4 bg-slate-950/40 border border-slate-800/60 rounded-2xl space-y-2">
-                  <h4 className="text-xs font-bold text-emerald-400">{c.name}</h4>
-                  <p className="text-xs text-slate-400">{c.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 3. Settings Screen View */}
-        {activeNav === 'settings' && (
-          <div className="absolute inset-0 md:relative md:w-80 lg:w-96 bg-slate-900 md:border-r border-slate-800 z-30 flex flex-col text-white shadow-2xl transition-all h-full">
-            <div className="h-16 bg-slate-950/60 px-4 flex items-center gap-4 border-b border-slate-800">
-              <h3 className="text-base font-bold tracking-tight">Settings</h3>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              <div 
-                onClick={() => setShowProfileModal(true)}
-                className="flex items-center gap-4 px-4 py-3 hover:bg-slate-800/40 rounded-xl cursor-pointer text-xs text-slate-300"
+              <button
+                onClick={onLogout}
+                title="Logout"
+                className="hidden md:block p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-xl transition cursor-pointer"
               >
-                <User className="w-4 h-4 text-emerald-400" />
-                <span>Profile Settings</span>
-              </div>
-              <div className="flex items-center gap-4 px-4 py-3 hover:bg-slate-800/40 rounded-xl cursor-pointer text-xs text-slate-300">
-                <Lock className="w-4 h-4 text-emerald-400" />
-                <span>Privacy & Security</span>
-              </div>
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
           </div>
-        )}
 
-        {/* Chats List Sidebar (Visible when activeNav is 'chats') */}
-        {activeNav === 'chats' && (
-          <div className={`w-full md:w-80 lg:w-96 bg-slate-900/40 border-r border-slate-800/80 flex flex-col backdrop-blur-xl ${selectedChat ? 'hidden md:flex' : 'flex'} flex-1 md:flex-initial pb-16 md:pb-0`}>
+          {/* Search Bar */}
+          <div className="p-3">
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Search className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                placeholder="Search or start new chat"
+                className="w-full bg-slate-950/60 border border-slate-800/80 focus:border-emerald-500/80 rounded-xl px-4 py-2 pl-9 text-xs text-white placeholder-slate-600 focus:outline-none transition"
+              />
+            </div>
+          </div>
 
-            {/* Chats Header with WhatsApp Mobile 3-Dot Menu */}
-            <div className="p-4 border-b border-slate-800/80 flex items-center justify-between relative">
-              <h3 className="text-base font-bold tracking-tight text-emerald-400">ChatWave</h3>
-              
-              <div className="flex items-center gap-2">
-                {/* 3-Dot Menu Button (Mobile view only) */}
-                <div className="relative md:hidden">
-                  <button
-                    onClick={() => setShowMenuDropdown(!showMenuDropdown)}
-                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/50 transition cursor-pointer"
-                  >
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
-
-                  {/* Dropdown Menu Popup */}
-                  {showMenuDropdown && (
-                    <div className="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50 text-xs">
-                      <button 
-                        onClick={() => { setShowProfileModal(true); setShowMenuDropdown(false); }}
-                        className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
-                      >
-                        <User className="w-4 h-4 text-emerald-400" /> Profile
-                      </button>
-                      <button 
-                        onClick={() => { setActiveNav('settings'); setShowMenuDropdown(false); }}
-                        className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
-                      >
-                        <Settings className="w-4 h-4 text-emerald-400" /> Settings
-                      </button>
-                      <div className="border-t border-slate-800 my-1"></div>
-                      <button 
-                        onClick={() => { setShowMenuDropdown(false); onLogout(); }}
-                        className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-red-400 flex items-center gap-2 font-medium"
-                      >
-                        <LogOut className="w-4 h-4" /> Logout
-                      </button>
-                    </div>
+          {/* Chats List */}
+          <div className="flex-1 overflow-y-auto px-2 space-y-1">
+            {chats.map((chat) => (
+              <div
+                key={chat.id}
+                onClick={() => setSelectedChat(chat)}
+                className={`p-3 rounded-2xl flex items-center gap-3 cursor-pointer transition ${selectedChat?.id === chat.id ? 'bg-emerald-500/10 border border-emerald-500/20' : 'hover:bg-slate-800/30 border border-transparent'}`}
+              >
+                <div className="relative">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center font-bold text-emerald-400 border border-slate-700">
+                    {chat.avatar}
+                  </div>
+                  {chat.online && (
+                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
                   )}
                 </div>
-
-                <button
-                  onClick={onLogout}
-                  title="Logout"
-                  className="hidden md:block p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-xl transition cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Search Bar */}
-            <div className="p-3">
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Search className="w-4 h-4" />
-                </span>
-                <input
-                  type="text"
-                  placeholder="Search or start new chat"
-                  className="w-full bg-slate-950/60 border border-slate-800/80 focus:border-emerald-500/80 rounded-xl px-4 py-2 pl-9 text-xs text-white placeholder-slate-600 focus:outline-none transition"
-                />
-              </div>
-            </div>
-
-            {/* Chats List */}
-            <div className="flex-1 overflow-y-auto px-2 space-y-1">
-              {chats.map((chat) => (
-                <div
-                  key={chat.id}
-                  onClick={() => setSelectedChat(chat)}
-                  className={`p-3 rounded-2xl flex items-center gap-3 cursor-pointer transition ${selectedChat?.id === chat.id ? 'bg-emerald-500/10 border border-emerald-500/20' : 'hover:bg-slate-800/30 border border-transparent'}`}
-                >
-                  <div className="relative">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center font-bold text-emerald-400 border border-slate-700">
-                      {chat.avatar}
-                    </div>
-                    {chat.online && (
-                      <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
-                    )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <h4 className="text-xs font-bold truncate">{chat.name}</h4>
+                    <span className="text-[10px] text-slate-500">{chat.time}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <h4 className="text-xs font-bold truncate">{chat.name}</h4>
-                      <span className="text-[10px] text-slate-500">{chat.time}</span>
-                    </div>
-                    <p className="text-xs text-slate-400 truncate">{chat.lastMsg}</p>
-                  </div>
+                  <p className="text-xs text-slate-400 truncate">{chat.lastMsg}</p>
                 </div>
-              ))}
-            </div>
-
+              </div>
+            ))}
           </div>
-        )}
+
+        </div>
 
         {/* Main Chat Area */}
         <div className={`flex-1 flex flex-col bg-slate-950/40 relative ${selectedChat ? 'flex' : 'hidden md:flex'}`}>
@@ -410,52 +332,38 @@ function ChatDashboard({ user, onLogout }) {
       {/* WhatsApp-style Mobile Bottom Navigation Bar */}
       {!selectedChat && (
         <div className="md:hidden absolute bottom-0 left-0 right-0 h-16 bg-slate-950 border-t border-slate-800/80 flex items-center justify-around z-30 px-2">
-          <button 
-            onClick={() => setActiveNav('chats')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition ${activeNav === 'chats' ? 'text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+          <button
+            onClick={() => navigate('/')}
+            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-emerald-400"
           >
             <MessageSquare className="w-5 h-5" />
             <span className="text-[10px] font-medium">Chats</span>
           </button>
-          
-          <button 
-            onClick={() => setActiveNav('status')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition ${activeNav === 'status' ? 'text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+
+          <button
+            onClick={() => navigate('/status')}
+            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-slate-400 hover:text-white"
           >
             <CircleDot className="w-5 h-5" />
             <span className="text-[10px] font-medium">Status</span>
           </button>
 
-          <button 
-            onClick={() => setActiveNav('communities')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition ${activeNav === 'communities' ? 'text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+          <button
+            onClick={() => navigate('/communities')}
+            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-slate-400 hover:text-white"
           >
             <Users className="w-5 h-5" />
             <span className="text-[10px] font-medium">Communities</span>
           </button>
 
-          <button 
-            onClick={() => setActiveNav('settings')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition ${activeNav === 'settings' ? 'text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+          <button
+            onClick={() => navigate('/settings')}
+            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-slate-400 hover:text-white"
           >
             <Settings className="w-5 h-5" />
             <span className="text-[10px] font-medium">Settings</span>
           </button>
         </div>
-      )}
-
-      {/* Profile Modal Integration */}
-      {showProfileModal && (
-        <ProfileModal 
-          isOpen={showProfileModal} 
-          onClose={() => setShowProfileModal(false)}
-          userData={{ name, about, phone }}
-          onUpdateProfile={(updatedData) => {
-            if (updatedData.name) setName(updatedData.name);
-            if (updatedData.about) setAbout(updatedData.about);
-            if (updatedData.phone) setPhone(updatedData.phone);
-          }}
-        />
       )}
 
     </div>
