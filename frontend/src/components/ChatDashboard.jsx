@@ -6,6 +6,7 @@ import {
   CircleDot, Users, Settings, Lock, User
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
+import BottomNav from './BottomNav'; // path apne folder ke hisaab se dekh lena
 
 function ChatDashboard({ user, onLogout }) {
   const navigate = useNavigate(); // <-- Initialize navigate
@@ -14,6 +15,7 @@ function ChatDashboard({ user, onLogout }) {
   const [messageText, setMessageText] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
 
   // Mobile 3-dot dropdown menu state
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
@@ -331,41 +333,10 @@ function ChatDashboard({ user, onLogout }) {
 
       {/* WhatsApp-style Mobile Bottom Navigation Bar */}
       {!selectedChat && (
-        <div className="md:hidden absolute bottom-0 left-0 right-0 h-16 bg-slate-950 border-t border-slate-800/80 flex items-center justify-around z-30 px-2">
-          <button
-            onClick={() => navigate('/')}
-            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-emerald-400"
-          >
-            <MessageSquare className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Chats</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/status')}
-            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-slate-400 hover:text-white"
-          >
-            <CircleDot className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Status</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/communities')}
-            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-slate-400 hover:text-white"
-          >
-            <Users className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Communities</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/settings')}
-            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition text-slate-400 hover:text-white"
-          >
-            <Settings className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Settings</span>
-          </button>
+        <div className="md:hidden absolute bottom-0 left-0 right-0 z-30">
+          <BottomNav />
         </div>
       )}
-
     </div>
   );
 }
