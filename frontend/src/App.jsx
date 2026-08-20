@@ -8,10 +8,12 @@ import ChatDashboard from './components/ChatDashboard';
 import ProfileModal from './components/ProfileModal';
 import StatusView from './components/StatusView';
 import CommunityView from './components/CommunityView';
-import SettingsView from './components/SettingsView'; // <-- SettingsView Import kiya
+import SettingsView from './components/SettingsView';
+import { useTheme } from './context/ThemeContext'; // <-- Theme hook import kiya
 
 function App() {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme(); // <-- yahan se isDarkMode state nikal li
 
   // Global user & app states taaki sabhi components me data share ho sake
   const [user, setUser] = useState({
@@ -46,7 +48,7 @@ function App() {
   ]);
 
   return (
-    <div>
+    <div className={`min-h-screen w-screen transition-colors duration-200 ${isDarkMode ? 'bg-[#050811] text-white' : 'bg-slate-100 text-slate-900'}`}>
       <Routes>
         <Route path='/' element={<Landing />} />
         <Route path='/signup' element={<Signup />} />
@@ -62,7 +64,7 @@ function App() {
         <Route
           path='/profile'
           element={
-            <div className="h-[100dvh] w-screen bg-[#050811] flex justify-center items-center">
+            <div className={`h-[100dvh] w-screen ${isDarkMode ? 'bg-[#050811]' : 'bg-slate-100'} flex justify-center items-center`}>
               <ProfileModal
                 user={user}
                 onClose={() => window.history.back()}

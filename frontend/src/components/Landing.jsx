@@ -1,22 +1,30 @@
 import React from 'react';
 import { MessageSquare, ShieldCheck, Zap, Radio, ArrowRight, Search, MoreVertical, Smile, Paperclip, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext'; // ThemeContext import kiya hai
 
 function Landing({ onGetStarted }) {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme(); // Theme state nikali hai
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950 text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-gray-950">
+    <div className={`min-h-screen flex flex-col justify-between transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950 text-white selection:bg-emerald-500 selection:text-gray-950' 
+        : 'bg-gradient-to-br from-slate-50 via-white to-emerald-50 text-slate-900 selection:bg-emerald-500 selection:text-white'
+    }`}>
       
       {/* Navbar - Full Width Left to Right */}
-      <nav className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-4 sm:py-6 w-full border-b border-gray-800/60 bg-gray-950/80 backdrop-blur-md sticky top-0 z-50">
+      <nav className={`flex items-center justify-between px-4 sm:px-6 md:px-12 py-4 sm:py-6 w-full border-b backdrop-blur-md sticky top-0 z-50 transition-colors duration-300 ${
+        isDarkMode ? 'border-gray-800/60 bg-gray-950/80' : 'border-slate-200 bg-white/80'
+      }`}>
         
         {/* Logo */}
         <div className="flex items-center space-x-2.5 cursor-pointer" onClick={() => navigate('/')}>
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-gray-950 shadow-lg shadow-emerald-500/20">
             <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 font-bold" />
           </div>
-          <span className="text-lg sm:text-xl font-extrabold tracking-wide text-white">
+          <span className={`text-lg sm:text-xl font-extrabold tracking-wide ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
             ChatWave
           </span>
         </div>
@@ -25,7 +33,9 @@ function Landing({ onGetStarted }) {
         <div className="flex items-center space-x-2 sm:space-x-4">
           <button 
             onClick={() => navigate('/login')}
-            className="text-xs sm:text-sm font-medium text-gray-300 hover:text-white hidden xs:block transition"
+            className={`text-xs sm:text-sm font-medium hidden xs:block transition ${
+              isDarkMode ? 'text-gray-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
             Sign In
           </button>
@@ -48,7 +58,7 @@ function Landing({ onGetStarted }) {
         </div>
 
         {/* Heading */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6 max-w-4xl">
+        <h1 className={`text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6 max-w-4xl ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
           Connect with your world <br className="hidden sm:inline" />
           <span className="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 bg-clip-text text-transparent">
             instantly & securely.
@@ -56,7 +66,7 @@ function Landing({ onGetStarted }) {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mb-10 leading-relaxed">
+        <p className={`text-lg sm:text-xl max-w-2xl mb-10 leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>
           A production-grade real-time messaging web app featuring live online presence indicators, instant typing status, and smooth media sharing.
         </p>
 
@@ -71,14 +81,20 @@ function Landing({ onGetStarted }) {
           </button>
           <a 
             href="#features"
-            className="w-full sm:w-auto font-semibold px-8 py-4 rounded-xl text-base border bg-gray-800/80 hover:bg-gray-800 text-gray-200 border-gray-700/60 transition duration-200 cursor-pointer flex items-center justify-center"
+            className={`w-full sm:w-auto font-semibold px-8 py-4 rounded-xl text-base border transition duration-200 cursor-pointer flex items-center justify-center ${
+              isDarkMode 
+                ? 'bg-gray-800/80 hover:bg-gray-800 text-gray-200 border-gray-700/60' 
+                : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'
+            }`}
           >
             Explore Features
           </a>
         </div>
 
         {/* Pro Mockup Preview Container */}
-        <div className="w-full relative rounded-2xl border border-gray-700/80 bg-gray-900/80 p-2 sm:p-4 shadow-2xl shadow-emerald-950/50 backdrop-blur-xl">
+        <div className={`w-full relative rounded-2xl border p-2 sm:p-4 shadow-2xl backdrop-blur-xl transition-colors duration-300 ${
+          isDarkMode ? 'border-gray-700/80 bg-gray-900/80 shadow-emerald-950/50' : 'border-slate-200 bg-white/80 shadow-slate-200'
+        }`}>
           <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl blur opacity-20 pointer-events-none"></div>
           
           <div className="relative rounded-lg overflow-hidden bg-[#0b141a] border border-gray-800 flex flex-col md:flex-row h-[350px] sm:h-[450px] text-left">
@@ -152,35 +168,43 @@ function Landing({ onGetStarted }) {
 
         {/* Feature Cards Grid */}
         <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 text-left w-full">
-          <div className="bg-gray-900/40 border border-gray-800 p-8 rounded-2xl backdrop-blur-sm hover:border-emerald-500/40 transition duration-300">
+          <div className={`border p-8 rounded-2xl backdrop-blur-sm transition duration-300 ${
+            isDarkMode ? 'bg-gray-900/45 border-gray-800 hover:border-emerald-500/40' : 'bg-white/70 border-slate-200 hover:border-emerald-500/40 shadow-sm'
+          }`}>
             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
               <Zap className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-lg mb-2 text-white">Real-Time WebSockets</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">Instant delivery powered by Socket.io with zero lag, ensuring seamless conversation flow.</p>
+            <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Real-Time WebSockets</h3>
+            <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Instant delivery powered by Socket.io with zero lag, ensuring seamless conversation flow.</p>
           </div>
 
-          <div className="bg-gray-900/40 border border-gray-800 p-8 rounded-2xl backdrop-blur-sm hover:border-emerald-500/40 transition duration-300">
+          <div className={`border p-8 rounded-2xl backdrop-blur-sm transition duration-300 ${
+            isDarkMode ? 'bg-gray-900/45 border-gray-800 hover:border-emerald-500/40' : 'bg-white/70 border-slate-200 hover:border-emerald-500/40 shadow-sm'
+          }`}>
             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
               <Radio className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-lg mb-2 text-white">Live Status & Typing</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">Track online presence indicators and real-time typing events just like modern messaging apps.</p>
+            <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Live Status & Typing</h3>
+            <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Track online presence indicators and real-time typing events just like modern messaging apps.</p>
           </div>
 
-          <div className="bg-gray-900/40 border border-gray-800 p-8 rounded-2xl backdrop-blur-sm hover:border-emerald-500/40 transition duration-300">
+          <div className={`border p-8 rounded-2xl backdrop-blur-sm transition duration-300 ${
+            isDarkMode ? 'bg-gray-900/45 border-gray-800 hover:border-emerald-500/40' : 'bg-white/70 border-slate-200 hover:border-emerald-500/40 shadow-sm'
+          }`}>
             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-lg mb-2 text-white">Secure MERN Architecture</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">Encrypted password hashing, robust JWT session management, and modular database schemas.</p>
+            <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Secure MERN Architecture</h3>
+            <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Encrypted password hashing, robust JWT session management, and modular database schemas.</p>
           </div>
         </div>
 
       </main>
 
       {/* Footer */}
-      <footer className="text-center py-6 text-gray-500 text-sm border-t border-gray-800/60 bg-gray-950">
+      <footer className={`text-center py-6 text-sm border-t transition-colors duration-300 ${
+        isDarkMode ? 'text-gray-500 border-gray-800/60 bg-gray-950' : 'text-slate-500 border-slate-200 bg-white'
+      }`}>
         <p>© 2026 ChatWave • Built with MERN Stack by Pintu</p>
       </footer>
 

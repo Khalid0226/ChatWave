@@ -10,7 +10,16 @@ export const ThemeProvider = ({ children }) => {
   });
 
   useEffect(() => {
+    // LocalStorage mein save karein
     localStorage.setItem('chatwave_theme', JSON.stringify(isDarkMode));
+
+    // HTML root element par dark class add/remove karein
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
   }, [isDarkMode]);
 
   const toggleTheme = () => {
