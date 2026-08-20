@@ -39,7 +39,7 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h3 className={`text-sm font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Profile</h3>
+            <h3 className="text-sm font-bold tracking-tight text-emerald-500">Profile</h3>
           </div>
 
           {/* Scrollable Body */}
