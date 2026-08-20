@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- React Router hook
+import { useNavigate } from 'react-router-dom';
 import {
   MessageSquare, Search, Send, Phone, Video, MoreVertical,
   Smile, Paperclip, CheckCheck, LogOut, ArrowLeft, X,
   CircleDot, Users, Settings, Lock, User
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
-import BottomNav from './BottomNav'; // path apne folder ke hisaab se dekh lena
+import BottomNav from './BottomNav';
 
 function ChatDashboard({ user, onLogout }) {
-  const navigate = useNavigate(); // <-- Initialize navigate
+  const navigate = useNavigate();
 
   const [selectedChat, setSelectedChat] = useState(null);
   const [messageText, setMessageText] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
 
   // Mobile 3-dot dropdown menu state
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
@@ -128,20 +127,20 @@ function ChatDashboard({ user, onLogout }) {
                   <div className="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50 text-xs">
                     <button
                       onClick={() => { navigate('/profile'); setShowMenuDropdown(false); }}
-                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2 cursor-pointer"
                     >
                       <User className="w-4 h-4 text-emerald-400" /> Profile
                     </button>
                     <button
                       onClick={() => { navigate('/settings'); setShowMenuDropdown(false); }}
-                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-slate-200 flex items-center gap-2 cursor-pointer"
                     >
                       <Settings className="w-4 h-4 text-emerald-400" /> Settings
                     </button>
                     <div className="border-t border-slate-800 my-1"></div>
                     <button
                       onClick={() => { setShowMenuDropdown(false); onLogout(); }}
-                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-red-400 flex items-center gap-2 font-medium"
+                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-red-400 flex items-center gap-2 font-medium cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" /> Logout
                     </button>

@@ -7,9 +7,12 @@ import Login from './auth/Login';
 import ChatDashboard from './components/ChatDashboard';
 import ProfileModal from './components/ProfileModal';
 import StatusView from './components/StatusView';
-import CommunityView from './components/CommunityView'; // <-- CommunityView Import kiya
+import CommunityView from './components/CommunityView';
+import SettingsView from './components/SettingsView'; // <-- SettingsView Import kiya
 
 function App() {
+  const navigate = useNavigate();
+
   // Global user & app states taaki sabhi components me data share ho sake
   const [user, setUser] = useState({
     name: 'Pintu Kumar',
@@ -91,6 +94,24 @@ function App() {
             <CommunityView
               communities={communities}
               onAddCommunity={(newComm) => setCommunities([newComm, ...communities])}
+              onBack={() => window.history.back()}
+            />
+          }
+        />
+
+        {/* Settings Route with Password Reset Support */}
+        <Route
+          path='/settings'
+          element={
+            <SettingsView
+              user={user}
+              onUpdateUser={(updatedData) => {
+                setUser(prev => ({ ...prev, ...updatedData }));
+              }}
+              onLogout={() => {
+                setUser(null);
+                navigate('/login');
+              }}
               onBack={() => window.history.back()}
             />
           }
