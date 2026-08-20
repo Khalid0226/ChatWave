@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MessageSquare, Mail, Lock, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext'; // ThemeContext import kiya hai
+import API from '../services/Axios';
 
 function Login({ onSwitchToSignup, onSuccess }) {
   const { isDarkMode } = useTheme(); // Theme state nikali hai
@@ -25,18 +26,18 @@ function Login({ onSwitchToSignup, onSuccess }) {
     setError('');
     setLoading(true);
 
-    // Temporary Frontend-only Mock
-    setTimeout(() => {
-      setLoading(false);
-      console.log('Mock Login Data:', formData);
-      
-      if (onSuccess) {
-        onSuccess(formData);
-      } else {
-        alert('Login Successful! (Frontend Mock)');
-        navigate('/dashboard');
+    try {
+      const response = await API.post('auth/login',formData)
+
+      if(response.status === 200){
+        alert(response.data.message)
       }
-    }, 1000);
+      navigate('/dashboard')
+    } catch (error) {
+      console.error(error);
+    }finally{
+      setLoading(false)
+    }
   };
 
   return (
