@@ -8,6 +8,7 @@ import {
 import EmojiPicker from 'emoji-picker-react';
 import BottomNav from './BottomNav';
 import { useTheme } from '../context/ThemeContext'; // ThemeContext import kiya hai
+import API from '../services/Axios';
 
 function ChatDashboard({ user, onLogout }) {
   const navigate = useNavigate();
@@ -58,6 +59,21 @@ function ChatDashboard({ user, onLogout }) {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await API.post('/auth/logout')
+
+      if(response.status === 200){
+        alert(response.data.message)
+      }
+
+      navigate('/login')
+    } catch (error) {
+      console.error(error);
+    }finally{
+      navigate('/login')
+    }
+  }
   return (
     <div className={`h-[100dvh] w-screen flex flex-col md:flex-row overflow-hidden selection:bg-emerald-500 selection:text-white relative transition-colors duration-300 ${
       isDarkMode ? 'bg-[#050811] text-white' : 'bg-slate-50 text-slate-900'
@@ -163,7 +179,7 @@ function ChatDashboard({ user, onLogout }) {
                     </button>
                     <div className={`border-t my-1 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}></div>
                     <button
-                      onClick={() => { setShowMenuDropdown(false); onLogout(); }}
+                      onClick={handleLogout}
                       className={`w-full text-left px-4 py-2.5 text-red-400 flex items-center gap-2 font-medium cursor-pointer ${
                         isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
                       }`}
@@ -175,7 +191,7 @@ function ChatDashboard({ user, onLogout }) {
               </div>
 
               <button
-                onClick={onLogout}
+                onClick={handleLogout}
                 title="Logout"
                 className={`hidden md:block p-2 rounded-xl transition cursor-pointer ${
                   isDarkMode ? 'text-slate-400 hover:text-red-400 hover:bg-slate-800/50' : 'text-slate-500 hover:text-red-600 hover:bg-slate-100'
