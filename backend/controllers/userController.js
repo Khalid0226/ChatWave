@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import userModel from "../models/userModel.js";
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import jwt, { decode } from 'jsonwebtoken'
 
 
 export const register = async (req,res) => {
@@ -58,7 +58,13 @@ export const login = async (req,res) => {
         let token = jwt.sign(
             {userId:user._id},
             process.env.JWT_SECRET,
-            {expiresIn:'1d'}
+            {expiresIn:'15m'}
+        )
+
+        let refreshToken = jwt.sign(
+            {userId:user._id},
+            process.env.REFRESH_TOKEN_SECRET,
+            {expiresIn:'7d'}
         )
 
         res.cookie('accessToken',token,{
@@ -66,6 +72,13 @@ export const login = async (req,res) => {
             secure:false,
             sameSite:'lax',
             maxAge:24*60*60*1000
+        })
+
+        res.cookie('refreshToken',refreshToken,{
+            httpOnly:true,
+            secure:false,
+            sameSite:'lax',
+            maxAge:7*24*60*60*1000
         })
 
          res.status(200).json({
@@ -80,6 +93,54 @@ export const login = async (req,res) => {
     } catch (error) {
         res.status(500).json({
             message:'failed to login user',
+            error:error.message
+        })
+    }
+}
+
+
+export const refreshToken = async (req,res) => {
+    try {
+        const token = req.cookies.refreshToken
+
+        if(!token){
+            return res.status(404).json({
+                message:'refresh token not found!!'
+            })
+        }
+
+        const decoded = jwt.verify(
+            token,
+            process.env.REFRESH_TOKEN_SECRET
+        )
+
+        const user = await userModel.findById(decoded.userId)
+
+        if(!user){
+            return res.status(404).json({
+                message:'user not found!!'
+            })
+        }
+
+        const newAccessToken = jwt.sign(
+            {userId:user._id},
+            process.env.JWT_SECRET,
+            {expiresIn:'15m'}
+        )
+
+        res.cookie('accessToken',newAccessToken,{
+            httpOnly:true,
+            secure:false,
+            sameSite:'lax',
+            maxAge:15*60*1000
+        })
+
+        res.status(200).json({
+            message:'token refreshed successfully!!'
+        })
+    } catch (error) {
+        res.status(401).json({
+            message:"refresh token not found!!!",
             error:error.message
         })
     }
