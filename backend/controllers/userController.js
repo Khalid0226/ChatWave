@@ -171,3 +171,18 @@ export const logout = async (req,res) => {
         })
     }
 }
+
+
+export const getMe = async (req,res) => {
+    try {
+        res.status(200).json({
+            message:'user found successfully',
+            user:req.user
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:'failed to fetch users',
+            error:error.message
+        })   
+    }
+}
