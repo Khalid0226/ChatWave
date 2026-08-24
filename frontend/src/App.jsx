@@ -10,17 +10,18 @@ import StatusView from './components/StatusView';
 import CommunityView from './components/CommunityView';
 import SettingsView from './components/SettingsView';
 import { useTheme } from './context/ThemeContext'; // <-- Theme hook import kiya
+import ProtectedRoute from './components/ProtectedRoute';
+import API from './services/Axios';
+import { useEffect } from 'react';
 
 function App() {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme(); // <-- yahan se isDarkMode state nikal li
 
   // Global user & app states taaki sabhi components me data share ho sake
-  const [user, setUser] = useState({
-    name: 'Pintu Kumar',
-    about: 'Full-stack MERN Developer & Tech Enthusiast 🚀',
-    phone: '+91 98765 43210'
-  });
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
 
   const [statuses, setStatuses] = useState([
     { id: 1, name: 'Rahul Sharma', time: 'Today at 9:15 AM', avatar: 'RS' },
@@ -47,6 +48,30 @@ function App() {
     }
   ]);
 
+  const getAuthUser = async () => {
+    try {
+      const response = await API.get('/auth/me')
+
+      setUser(response.data.user)
+    } catch (error) {
+      console.error(error);
+    }finally{
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getAuthUser()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className={`h-screen w-screen flex items-center justify-center ${isDarkMode ? 'bg-[#050811] text-emerald-400' : 'bg-slate-100 text-slate-800'} font-bold`}>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen w-screen transition-colors duration-200 ${isDarkMode ? 'bg-[#050811] text-white' : 'bg-slate-100 text-slate-900'}`}>
       <Routes>
@@ -57,22 +82,24 @@ function App() {
         {/* Dashboard Route */}
         <Route
           path='/dashboard'
-          element={<ChatDashboard user={user} onLogout={() => setUser(null)} />}
+          element={<ProtectedRoute user={user}><ChatDashboard user={user} onLogout={() => setUser(null)} /></ProtectedRoute>}
         />
 
         {/* Profile Route with proper props and centering layout */}
         <Route
           path='/profile'
           element={
-            <div className={`h-[100dvh] w-screen ${isDarkMode ? 'bg-[#050811]' : 'bg-slate-100'} flex justify-center items-center`}>
-              <ProfileModal
-                user={user}
-                onClose={() => window.history.back()}
-                onUpdateProfile={(updatedData) => {
-                  setUser(prev => ({ ...prev, ...updatedData }));
-                }}
-              />
-            </div>
+            <ProtectedRoute user={user}>
+              <div className={`h-[100dvh] w-screen ${isDarkMode ? 'bg-[#050811]' : 'bg-slate-100'} flex justify-center items-center`}>
+                <ProfileModal
+                  user={user}
+                  onClose={() => window.history.back()}
+                  onUpdateProfile={(updatedData) => {
+                    setUser(prev => ({ ...prev, ...updatedData }));
+                  }}
+                />
+              </div>
+            </ProtectedRoute>
           }
         />
 
@@ -80,12 +107,14 @@ function App() {
         <Route
           path='/status'
           element={
-            <StatusView
-              currentUser={user}
-              statuses={statuses}
-              onAddStatus={(newStatus) => setStatuses([newStatus, ...statuses])}
-              onBack={() => window.history.back()}
-            />
+            <ProtectedRoute user={user}>
+              <StatusView
+                currentUser={user}
+                statuses={statuses}
+                onAddStatus={(newStatus) => setStatuses([newStatus, ...statuses])}
+                onBack={() => window.history.back()}
+              />
+            </ProtectedRoute>
           }
         />
 
@@ -93,11 +122,13 @@ function App() {
         <Route
           path='/communities'
           element={
-            <CommunityView
-              communities={communities}
-              onAddCommunity={(newComm) => setCommunities([newComm, ...communities])}
-              onBack={() => window.history.back()}
-            />
+            <ProtectedRoute user={user}>
+              <CommunityView
+                communities={communities}
+                onAddCommunity={(newComm) => setCommunities([newComm, ...communities])}
+                onBack={() => window.history.back()}
+              />
+            </ProtectedRoute>
           }
         />
 
@@ -105,17 +136,19 @@ function App() {
         <Route
           path='/settings'
           element={
-            <SettingsView
-              user={user}
-              onUpdateUser={(updatedData) => {
-                setUser(prev => ({ ...prev, ...updatedData }));
-              }}
-              onLogout={() => {
-                setUser(null);
-                navigate('/login');
-              }}
-              onBack={() => window.history.back()}
-            />
+            <ProtectedRoute user={user}>
+              <SettingsView
+                user={user}
+                onUpdateUser={(updatedData) => {
+                  setUser(prev => ({ ...prev, ...updatedData }));
+                }}
+                onLogout={() => {
+                  setUser(null);
+                  navigate('/login');
+                }}
+                onBack={() => window.history.back()}
+              />
+            </ProtectedRoute>
           }
         />
       </Routes>

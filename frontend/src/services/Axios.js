@@ -6,24 +6,27 @@ let API = axios.create({
 })
 
 API.interceptors.response.use(
-    (response)=>{
+    (response) => {
         return response
     },
 
     async (error) => {
-        if(error.response?.status === 401 && !error.config._retry){
+        if (error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !originalRequest.url.includes('/auth/me') &&
+            !originalRequest.url.includes('/auth/login')) {
             error.config._retry = true
 
             try {
                 const response = await API.post('/auth/refresh-token',
                     {},
                     {
-                        withCredentials:true
+                        withCredentials: true
                     }
                 )
                 return API(error.config)
             } catch (error) {
-                window.location.href = '/login'   
+                window.location.href = '/login'
             }
         }
         return Promise.reject(error)

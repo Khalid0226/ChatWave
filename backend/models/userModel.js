@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
     email:{
         type:String,
         required:true,
-        unique:true
+        unique:true,
+        lowercase:true
     },
     phone:{
         type:String,
@@ -17,6 +18,15 @@ const userSchema = new mongoose.Schema({
     password:{
         type:String,
         required:true
+    },
+    about:{
+        type:String,
+        required:true,
+        default:'hello chatWave User!!!'
+    },
+    avatar:{
+        type:String,
+        default:''
     }
 },{timestamps:true}
 )
