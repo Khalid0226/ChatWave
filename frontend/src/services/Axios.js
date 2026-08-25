@@ -11,7 +11,10 @@ API.interceptors.response.use(
     },
 
     async (error) => {
+
+        const originalRequest = error.config;
         if (error.response?.status === 401 &&
+            originalRequest &&
             !originalRequest._retry &&
             !originalRequest.url.includes('/auth/me') &&
             !originalRequest.url.includes('/auth/login')) {
