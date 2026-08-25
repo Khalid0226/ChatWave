@@ -9,12 +9,17 @@ export const register = async (req,res) => {
     try {
         const {name,email,phone,password} = req.body
 
-        const exist = await userModel.findOne({email})
+        // Check karo ki email ya phone number pehle se registered toh nahi hai
+        const existingUser = await userModel.findOne({ 
+            $or: [{ email }, { phone }] 
+        });
 
-        if(exist){
-            return res.status(409).json({
-                message:'user already axist'
-            })
+        if (existingUser) {
+            const message = existingUser.email === email 
+                ? 'User with this email already exists!' 
+                : 'User with this phone number already exists!';
+            
+            return res.status(409).json({ message });
         }
 
         const hashedPassword = await bcrypt.hash(password,10)
