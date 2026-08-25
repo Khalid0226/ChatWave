@@ -56,19 +56,19 @@ export const addContact = async (req,res) => {
 }
 
 
-// export const getMyContacts = async (req,res) => {
-//     try {
-//         const currentUser = await userModel.findById(req.user.id)
-//         .populate('contacts','name phone email about avatar')
+export const getMyContacts = async (req,res) => {
+    try {
+        const currentUser = await userModel.findById(req.user.id)
+        .populate('contacts','name phone email about avatar')
 
-//         res.status(200).json({
-//             message:'contacts fetched successfully!!',
-//             contacts:currentUser.contacts
-//         })
-//     } catch (error) {
-//         req.status(500).json({
-//             message:'failed to fetch contacts!!',
-//             error:error.message
-//         })
-//     }
-// }
+        res.status(200).json({
+            message:'contacts fetched successfully!!',
+            contacts:currentUser.contacts
+        })
+    } catch (error) {
+        req.status(500).json({
+            message:'failed to fetch contacts!!',
+            error:error.message
+        })
+    }
+}

@@ -5,6 +5,6 @@ import { authMiddleWare } from "../middleware/authMiddleWare.js";
 const router = express.Router()
 
 router.post('/add-contact',authMiddleWare,addContact)
-// router.get('/my-contacts',authMiddleWare,getMyContacts)
+router.get('/my-contacts',authMiddleWare,getMyContacts)
 
 export default router
