@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MessageSquare, Search, Send, Phone, Video, MoreVertical,
   Smile, Paperclip, CheckCheck, LogOut, ArrowLeft, X,
-  CircleDot, Users, Settings, User, UserPlus
+  CircleDot, Users, Settings, User, UserPlus, Trash2
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 import BottomNav from './BottomNav';
-import AddContactModal from './AddContactModal'; // Add Contact Modal import kiya hai
+import AddContactModal from './AddContactModal';
 import { useTheme } from '../context/ThemeContext';
 import API from '../services/Axios';
 
@@ -20,6 +20,7 @@ function ChatDashboard({ user, onLogout }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
+  const [showChatMenu, setShowChatMenu] = useState(false); // Chat header ke 3-dots menu ke liye
 
   // Contacts & Modal states
   const [contacts, setContacts] = useState([]);
@@ -79,6 +80,28 @@ function ChatDashboard({ user, onLogout }) {
       console.error(error);
     } finally {
       navigate('/login');
+    }
+  };
+
+  // Remove Contact function
+  const removeContact = async (contactId) => {
+    const confirmDelete = window.confirm('Kya aap is contact ko hatana chahte hain?');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await API.delete(`/chat/remove-contact/${contactId}`);
+
+      if (response.status === 200) {
+        setContacts((prevContact) => prevContact.filter((c) => c._id !== contactId));
+      }
+
+      if (selectedChat?._id === contactId) {
+        setSelectedChat(null);
+      }
+      setShowChatMenu(false);
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Contact remove karne me error aaya.");
     }
   };
 
@@ -155,7 +178,6 @@ function ChatDashboard({ user, onLogout }) {
             <h3 className="text-base font-bold tracking-tight text-emerald-500">ChatWave</h3>
 
             <div className="flex items-center gap-2">
-              {/* Add Contact Button */}
               <button
                 onClick={() => setIsAddModalOpen(true)}
                 title="Add Contact"
@@ -249,25 +271,27 @@ function ChatDashboard({ user, onLogout }) {
                 <div
                   key={contact._id}
                   onClick={() => setSelectedChat(contact)}
-                  className={`p-3 rounded-2xl flex items-center gap-3 cursor-pointer transition ${
+                  className={`p-3 rounded-2xl flex items-center justify-between cursor-pointer transition ${
                     selectedChat?._id === contact._id 
                       ? 'bg-emerald-500/10 border border-emerald-500/20' 
                       : isDarkMode ? 'hover:bg-slate-800/30 border border-transparent' : 'hover:bg-slate-100 border border-transparent'
                   }`}
                 >
-                  <div className="relative">
-                    <div className={`w-11 h-11 rounded-2xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border ${
-                      isDarkMode ? 'from-slate-800 to-slate-700 border-slate-700' : 'from-slate-100 to-slate-200 border-slate-300'
-                    }`}>
-                      {contact.name.charAt(0).toUpperCase()}
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="relative">
+                      <div className={`w-11 h-11 rounded-2xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border ${
+                        isDarkMode ? 'from-slate-800 to-slate-700 border-slate-700' : 'from-slate-100 to-slate-200 border-slate-300'
+                      }`}>
+                        {contact.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
                     </div>
-                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <h4 className={`text-xs font-bold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{contact.name}</h4>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <h4 className={`text-xs font-bold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{contact.name}</h4>
+                      </div>
+                      <p className="text-xs text-slate-400 truncate">{contact.about || 'Hey there! I am using ChatWave.'}</p>
                     </div>
-                    <p className="text-xs text-slate-400 truncate">{contact.about || 'Hey there! I am using ChatWave.'}</p>
                   </div>
                 </div>
               ))
@@ -283,9 +307,9 @@ function ChatDashboard({ user, onLogout }) {
 
           {selectedChat ? (
             <>
-              {/* Chat Header */}
-              <div className={`h-16 border-b px-4 md:px-6 flex items-center justify-between backdrop-blur-xl z-10 transition-colors duration-300 ${
-                isDarkMode ? 'border-slate-800/80' : 'border-slate-200 bg-white/80'
+              {/* Chat Header - Fixed z-index & overflow to avoid overlap */}
+              <div className={`h-16 border-b px-4 md:px-6 flex items-center justify-between relative z-30 backdrop-blur-xl transition-colors duration-300 ${
+                isDarkMode ? 'border-slate-800/80 bg-slate-950/80' : 'border-slate-200 bg-white/90'
               }`}>
                 <div className="flex items-center gap-3">
                   <button
@@ -311,16 +335,38 @@ function ChatDashboard({ user, onLogout }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 md:gap-2 text-slate-400">
+                <div className="flex items-center gap-1 md:gap-2 text-slate-400 relative">
                   <button className={`p-2 rounded-xl transition cursor-pointer ${isDarkMode ? 'hover:bg-slate-800/50 hover:text-white' : 'hover:bg-slate-100 hover:text-slate-900'}`}>
                     <Phone className="w-4 h-4" />
                   </button>
                   <button className={`p-2 rounded-xl transition cursor-pointer ${isDarkMode ? 'hover:bg-slate-800/50 hover:text-white' : 'hover:bg-slate-100 hover:text-slate-900'}`}>
                     <Video className="w-4 h-4" />
                   </button>
-                  <button className={`p-2 rounded-xl transition cursor-pointer ${isDarkMode ? 'hover:bg-slate-800/50 hover:text-white' : 'hover:bg-slate-100 hover:text-slate-900'}`}>
-                    <MoreVertical className="w-4 h-4" />
-                  </button>
+                  
+                  {/* Chat 3-dots Menu with Proper Dropdown Placement */}
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowChatMenu(!showChatMenu)}
+                      className={`p-2 rounded-xl transition cursor-pointer ${isDarkMode ? 'hover:bg-slate-800/50 hover:text-white' : 'hover:bg-slate-100 hover:text-slate-900'}`}
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+
+                    {showChatMenu && (
+                      <div className={`absolute right-0 top-10 w-44 border rounded-2xl shadow-2xl py-2 z-50 text-xs transition-colors duration-300 ${
+                        isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-700'
+                      }`}>
+                        <button
+                          onClick={() => removeContact(selectedChat._id)}
+                          className={`w-full text-left px-4 py-2.5 text-red-400 flex items-center gap-2 font-medium cursor-pointer ${
+                            isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                          }`}
+                        >
+                          <Trash2 className="w-4 h-4" /> Delete Contact
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
