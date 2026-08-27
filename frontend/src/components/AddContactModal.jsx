@@ -29,7 +29,7 @@ function AddContactModal({ isOpen, onClose, onContactAdded, isDarkMode }) {
 
         setTimeout(() => {
         onClose();
-      }, 1500);
+      }, 100);
     } catch (error) {
         setError(error.response?.data?.message)
     } finally{

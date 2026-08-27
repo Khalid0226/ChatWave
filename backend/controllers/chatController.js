@@ -72,3 +72,31 @@ export const getMyContacts = async (req,res) => {
         })
     }
 }
+
+
+export const removeContacts = async (req,res) => {
+    try {
+        const contactIdToRemove = req.params.id
+        const myUserId = req.user.id
+
+        const updateUser = await userModel.findByIdAndUpdate(
+            myUserId,
+            {$pull:{contacts:contactIdToRemove}},
+            {new:true}
+        )
+
+        if(!updateUser){
+            return res.status(404).json({
+                message:"user not found!!"
+            })
+        }
+
+        res.status(200).json({
+            message:"contact removed successfully!!!"
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:'failed to remove contact!!!'
+        })
+    }
+}
