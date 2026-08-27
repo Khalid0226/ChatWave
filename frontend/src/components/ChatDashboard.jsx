@@ -1,40 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MessageSquare, Search, Send, Phone, Video, MoreVertical,
   Smile, Paperclip, CheckCheck, LogOut, ArrowLeft, X,
-  CircleDot, Users, Settings, Lock, User
+  CircleDot, Users, Settings, User, UserPlus
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 import BottomNav from './BottomNav';
-import { useTheme } from '../context/ThemeContext'; // ThemeContext import kiya hai
+import AddContactModal from './AddContactModal'; // Add Contact Modal import kiya hai
+import { useTheme } from '../context/ThemeContext';
 import API from '../services/Axios';
 
 function ChatDashboard({ user, onLogout }) {
   const navigate = useNavigate();
-  const { isDarkMode } = useTheme(); // Theme state nikali hai
+  const { isDarkMode } = useTheme();
 
   const [selectedChat, setSelectedChat] = useState(null);
   const [messageText, setMessageText] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-  // Mobile 3-dot dropdown menu state
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 
-  // Profile states
+  // Contacts & Modal states
+  const [contacts, setContacts] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const [name] = useState(user?.name || 'Pintu Kumar');
+
+  // Backend se added contacts fetch karne ke liye
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await API.get('/chat/my-contacts');
+        setContacts(response.data.contacts || []);
+      } catch (error) {
+        console.error("Failed to fetch contacts:", error);
+      }
+    };
+    fetchContacts();
+  }, []);
 
   const [messages, setMessages] = useState([
     { id: 1, sender: 'them', text: 'Hey Pintu! Kaise ho? ChatWave ka frontend kaisa chal raha hai?', time: '10:30 AM' },
     { id: 2, sender: 'me', text: 'Ekdum mast chal raha hai! Ekdum professional look aa raha hai.', time: '10:32 AM' }
   ]);
-
-  const chats = [
-    { id: 1, name: 'Rahul Sharma', lastMsg: 'Ekdum mast chal raha hai!', time: '10:32 AM', avatar: 'RS', online: true },
-    { id: 2, name: 'Priya Verma', lastMsg: 'Kal college milte hain.', time: 'Yesterday', avatar: 'PV', online: false },
-    { id: 3, name: 'Web Dev Group', lastMsg: 'Meeting link bhej diya hai.', time: 'Monday', avatar: 'WD', online: true }
-  ];
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -61,19 +70,18 @@ function ChatDashboard({ user, onLogout }) {
 
   const handleLogout = async () => {
     try {
-      const response = await API.post('/auth/logout')
-
+      const response = await API.post('/auth/logout');
       if(response.status === 200){
-        alert(response.data.message)
+        alert(response.data.message);
       }
-
-      navigate('/login')
+      navigate('/login');
     } catch (error) {
       console.error(error);
-    }finally{
-      navigate('/login')
+    } finally {
+      navigate('/login');
     }
-  }
+  };
+
   return (
     <div className={`h-[100dvh] w-screen flex flex-col md:flex-row overflow-hidden selection:bg-emerald-500 selection:text-white relative transition-colors duration-300 ${
       isDarkMode ? 'bg-[#050811] text-white' : 'bg-slate-50 text-slate-900'
@@ -140,13 +148,23 @@ function ChatDashboard({ user, onLogout }) {
           isDarkMode ? 'bg-slate-900/40 border-slate-800/80' : 'bg-white/70 border-slate-200'
         } ${selectedChat ? 'hidden md:flex' : 'flex'} flex-1 md:flex-initial pb-16 md:pb-0`}>
 
-          {/* Chats Header with Mobile 3-Dot Menu */}
+          {/* Chats Header with Add Contact Button */}
           <div className={`p-4 border-b flex items-center justify-between relative transition-colors duration-300 ${
             isDarkMode ? 'border-slate-800/80' : 'border-slate-200'
           }`}>
             <h3 className="text-base font-bold tracking-tight text-emerald-500">ChatWave</h3>
 
             <div className="flex items-center gap-2">
+              {/* Add Contact Button */}
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                title="Add Contact"
+                className="p-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 text-xs font-bold bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span className="hidden sm:inline">Add</span>
+              </button>
+
               <div className="relative md:hidden">
                 <button
                   onClick={() => setShowMenuDropdown(!showMenuDropdown)}
@@ -210,7 +228,7 @@ function ChatDashboard({ user, onLogout }) {
               </span>
               <input
                 type="text"
-                placeholder="Search or start new chat"
+                placeholder="Search contacts"
                 className={`w-full border rounded-xl px-4 py-2 pl-9 text-xs placeholder-slate-400 focus:outline-none transition ${
                   isDarkMode 
                     ? 'bg-slate-950/60 border-slate-800/80 focus:border-emerald-500/80 text-white' 
@@ -220,39 +238,40 @@ function ChatDashboard({ user, onLogout }) {
             </div>
           </div>
 
-          {/* Chats List */}
+          {/* Dynamic Contacts List */}
           <div className="flex-1 overflow-y-auto px-2 space-y-1">
-            {chats.map((chat) => (
-              <div
-                key={chat.id}
-                onClick={() => setSelectedChat(chat)}
-                className={`p-3 rounded-2xl flex items-center gap-3 cursor-pointer transition ${
-                  selectedChat?.id === chat.id 
-                    ? 'bg-emerald-500/10 border border-emerald-500/20' 
-                    : isDarkMode ? 'hover:bg-slate-800/30 border border-transparent' : 'hover:bg-slate-100 border border-transparent'
-                }`}
-              >
-                <div className="relative">
-                  <div className={`w-11 h-11 rounded-2xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border ${
-                    isDarkMode ? 'from-slate-800 to-slate-700 border-slate-700' : 'from-slate-100 to-slate-200 border-slate-300'
-                  }`}>
-                    {chat.avatar}
-                  </div>
-                  {chat.online && (
-                    <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 ${
-                      isDarkMode ? 'border-slate-950' : 'border-white'
-                    }`}></span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <h4 className={`text-xs font-bold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{chat.name}</h4>
-                    <span className="text-[10px] text-slate-400">{chat.time}</span>
-                  </div>
-                  <p className="text-xs text-slate-400 truncate">{chat.lastMsg}</p>
-                </div>
+            {contacts.length === 0 ? (
+              <div className="text-center py-10 px-4 text-slate-400 text-xs">
+                No contacts added yet. Click on <span className="text-emerald-500 font-bold">Add</span> to search & add contacts via phone number!
               </div>
-            ))}
+            ) : (
+              contacts.map((contact) => (
+                <div
+                  key={contact._id}
+                  onClick={() => setSelectedChat(contact)}
+                  className={`p-3 rounded-2xl flex items-center gap-3 cursor-pointer transition ${
+                    selectedChat?._id === contact._id 
+                      ? 'bg-emerald-500/10 border border-emerald-500/20' 
+                      : isDarkMode ? 'hover:bg-slate-800/30 border border-transparent' : 'hover:bg-slate-100 border border-transparent'
+                  }`}
+                >
+                  <div className="relative">
+                    <div className={`w-11 h-11 rounded-2xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border ${
+                      isDarkMode ? 'from-slate-800 to-slate-700 border-slate-700' : 'from-slate-100 to-slate-200 border-slate-300'
+                    }`}>
+                      {contact.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <h4 className={`text-xs font-bold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{contact.name}</h4>
+                    </div>
+                    <p className="text-xs text-slate-400 truncate">{contact.about || 'Hey there! I am using ChatWave.'}</p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
         </div>
@@ -282,17 +301,13 @@ function ChatDashboard({ user, onLogout }) {
                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border ${
                       isDarkMode ? 'from-slate-800 to-slate-700 border-slate-700' : 'from-slate-100 to-slate-200 border-slate-300'
                     }`}>
-                      {selectedChat.avatar}
+                      {selectedChat.name.charAt(0).toUpperCase()}
                     </div>
-                    {selectedChat.online && (
-                      <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 ${
-                        isDarkMode ? 'border-slate-950' : 'border-white'
-                      }`}></span>
-                    )}
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
                   </div>
                   <div>
                     <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{selectedChat.name}</h3>
-                    <p className="text-[10px] text-slate-400">{selectedChat.online ? 'Active now' : 'Offline'}</p>
+                    <p className="text-[10px] text-slate-400">Active now</p>
                   </div>
                 </div>
 
@@ -411,6 +426,16 @@ function ChatDashboard({ user, onLogout }) {
         </div>
 
       </div>
+
+      {/* Add Contact Modal Component */}
+      <AddContactModal 
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onContactAdded={(newContact) => {
+          setContacts((prev) => [...prev, newContact]);
+        }}
+        isDarkMode={isDarkMode}
+      />
 
       {/* WhatsApp-style Mobile Bottom Navigation Bar */}
       {!selectedChat && (
