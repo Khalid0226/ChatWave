@@ -27,16 +27,27 @@ function Login({ onSwitchToSignup, onSuccess }) {
     setLoading(true);
 
     try {
-      const response = await API.post('auth/login',formData)
+      const response = await API.post('auth/login', formData);
+      console.log("Login Response Data:", response.data);
 
-      if(response.status === 200){
-        alert(response.data.message)
+      if (response.status === 200) {
+        // App.jsx ki user state ko turant update karne ke liye
+        if (onSuccess && response.data.user) {
+          onSuccess(response.data.user);
+        } else if (response.data.user) {
+          // Fallback agar onSuccess prop pass na hua ho toh window reload ya dispatch handle ho sake
+          window.location.href = '/dashboard';
+          return;
+        }
+
+        alert(response.data.message);
+        navigate('/dashboard');
       }
-      navigate('/dashboard')
     } catch (error) {
       console.error(error);
-    }finally{
-      setLoading(false)
+      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
 

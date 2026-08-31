@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, Edit2, Check, Phone, Bell, Lock, HelpCircle } from 'lucide-react';
 import BottomNav from './BottomNav';
-import { useTheme } from '../context/ThemeContext'; // ThemeContext import kiya hai
+import { useTheme } from '../context/ThemeContext';
 import API from '../services/Axios';
 
 function ProfileModal({ user, onClose, onUpdateProfile }) {
-  const { isDarkMode } = useTheme(); // Theme state nikali hai
+  const { isDarkMode } = useTheme();
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingAbout, setIsEditingAbout] = useState(false);
@@ -13,28 +13,80 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
 
   const [name, setName] = useState(user?.name || 'Pintu Kumar');
   const [about, setAbout] = useState(user?.about || 'Full-stack MERN Developer & Tech Enthusiast 🚀');
-  const [phone,setPhone] = useState(user?.phone || '+91 98765 43210');
-  const [loading, setLoading] = useState(false)
+  const [phone, setPhone] = useState(user?.phone || '+91 98765 43210');
+
+  const [avatar, setAvatar] = useState(user?.avatar || '');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(user?.avatar || '');
+  const [loading, setLoading] = useState(false);
+
+  // Parent ya user prop change hone par local state ko sync karne ke liye
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setAbout(user.about || '');
+      setPhone(user.phone || '');
+      if (user.avatar) {
+        setAvatar(user.avatar);
+        setPreviewUrl(user.avatar);
+      }
+    }
+  }, [user]);
+
+  // File select hone par preview aur state update karne ke liye
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Instant preview ke liye
+    }
+  };
 
   const updateProfile = async (updatedFields) => {
     try {
-      setLoading(true)
-      const payload = { name, about, phone, ...updatedFields }
-      const response = await API.patch('/update-profile', payload)
+      setLoading(true);
 
-      if (onUpdateProfile) {
-        onUpdateProfile(response.data.updateUser)
+      const formData = new FormData();
+      formData.append('name', updatedFields.name !== undefined ? updatedFields.name : name);
+      formData.append('about', updatedFields.about !== undefined ? updatedFields.about : about);
+      formData.append('phone', updatedFields.phone !== undefined ? updatedFields.phone : phone);
+
+      if (selectedFile) {
+        formData.append('profilePic', selectedFile);
       }
 
-      if(response.status === 200){
-        alert(response.data.message)
+      const response = await API.put('/update-profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Backend se jo updated user object aaya hai
+      const updatedUser = response.data.updateUser || response.data.user;
+
+      if (updatedUser) {
+        if (updatedUser.avatar) {
+          setPreviewUrl(updatedUser.avatar);
+          setAvatar(updatedUser.avatar);
+        }
+      }
+
+      if (onUpdateProfile) {
+        onUpdateProfile(updatedUser); // Parent component ko naya user data bhejein
+      }
+
+      if (response.status === 200) {
+        alert(response.data.message || 'Profile updated successfully!');
+        setSelectedFile(null); // File reset karein
       }
     } catch (error) {
       console.error(error);
+      alert(error.response?.data?.message || 'Failed to update profile!');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
   return (
     <div className={`h-[100dvh] w-screen flex flex-col justify-between overflow-hidden relative selection:bg-emerald-500 selection:text-slate-950 transition-colors duration-300 ${isDarkMode ? 'bg-[#050811] text-white' : 'bg-slate-50 text-slate-900'
       }`}>
@@ -67,15 +119,28 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
             <div className={`flex flex-col items-center py-6 border-b transition-colors duration-300 ${isDarkMode ? 'bg-slate-950/30 border-slate-800/60' : 'bg-slate-50/50 border-slate-200'
               }`}>
               <div className="relative group">
-                <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-3xl shadow-xl shadow-emerald-500/20">
-                  {name.charAt(0).toUpperCase()}
+                <div className="w-28 h-28 rounded-full overflow-hidden bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-3xl shadow-xl shadow-emerald-500/20">
+                  {previewUrl ? (
+                    <img src={previewUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    name.charAt(0).toUpperCase()
+                  )}
                 </div>
                 <label className="absolute inset-0 bg-slate-950/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer text-white text-[10px] font-semibold tracking-wider">
                   <Camera className="w-5 h-5 mb-1" />
                   CHANGE PHOTO
-                  <input type="file" className="hidden" />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                 </label>
               </div>
+              {selectedFile && (
+                <button
+                  onClick={() => updateProfile({ name, about, phone })}
+                  disabled={loading}
+                  className="mt-3 px-4 py-1.5 bg-emerald-500 text-slate-950 font-bold text-xs rounded-lg shadow-md hover:bg-emerald-600 transition"
+                >
+                  {loading ? 'Uploading...' : 'Upload New Photo'}
+                </button>
+              )}
             </div>
 
             {/* Name Section */}
@@ -98,8 +163,8 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
 
                 <button
                   onClick={() => {
-                    if (isEditingName && onUpdateProfile) {
-                      onUpdateProfile({ name, about });
+                    if (isEditingName) {
+                      updateProfile({ name });
                     }
                     setIsEditingName(!isEditingName);
                   }}
@@ -130,8 +195,8 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
 
                 <button
                   onClick={() => {
-                    if (isEditingAbout && onUpdateProfile) {
-                      onUpdateProfile({ name, about });
+                    if (isEditingAbout) {
+                      updateProfile({ about });
                     }
                     setIsEditingAbout(!isEditingAbout);
                   }}
@@ -142,7 +207,7 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
               </div>
             </div>
 
-            {/* Phone Section (Ab Editable hai) */}
+            {/* Phone Section */}
             <div className={`px-6 py-4 border-y transition-colors duration-300 ${isDarkMode ? 'bg-slate-950/40 border-slate-800/60' : 'bg-slate-50/60 border-slate-200'
               }`}>
               <p className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider mb-1">Phone</p>
@@ -173,7 +238,6 @@ function ProfileModal({ user, onClose, onUpdateProfile }) {
                   >
                     {isEditingPhone ? <Check className="w-4 h-4 text-emerald-500" /> : <Edit2 className="w-4 h-4" />}
                   </button>
-                  {/* <Phone className="w-4 h-4 text-slate-400" /> */}
                 </div>
               </div>
             </div>

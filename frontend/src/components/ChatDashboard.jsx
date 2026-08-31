@@ -20,7 +20,7 @@ function ChatDashboard({ user, onLogout }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
-  const [showChatMenu, setShowChatMenu] = useState(false); // Chat header ke 3-dots menu ke liye
+  const [showChatMenu, setShowChatMenu] = useState(false);
 
   // Contacts & Modal states
   const [contacts, setContacts] = useState([]);
@@ -45,6 +45,19 @@ function ChatDashboard({ user, onLogout }) {
     { id: 1, sender: 'them', text: 'Hey Pintu! Kaise ho? ChatWave ka frontend kaisa chal raha hai?', time: '10:30 AM' },
     { id: 2, sender: 'me', text: 'Ekdum mast chal raha hai! Ekdum professional look aa raha hai.', time: '10:32 AM' }
   ]);
+
+  // Contact select karne par chat/messages fetch karne ka function
+  const handleSelectChat = async (contact) => {
+    setSelectedChat(contact);
+    setShowChatMenu(false);
+    try {
+      // Agar backend par messages fetch karne ka route ho toh yahan call karein:
+      // const response = await API.get(`/chat/messages/${contact._id}`);
+      // setMessages(response.data.messages || []);
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+    }
+  };
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -155,10 +168,14 @@ function ChatDashboard({ user, onLogout }) {
 
           <div
             onClick={() => navigate('/profile')}
-            className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-bold cursor-pointer shadow-lg shadow-emerald-500/20 hover:scale-105 transition"
+            className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-bold cursor-pointer shadow-lg shadow-emerald-500/20 hover:scale-105 transition overflow-hidden"
             title="Profile"
           >
-            {name.charAt(0).toUpperCase()}
+            {user?.avatar ? (
+              <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              name.charAt(0).toUpperCase()
+            )}
           </div>
         </div>
       </div>
@@ -270,7 +287,7 @@ function ChatDashboard({ user, onLogout }) {
               contacts.map((contact) => (
                 <div
                   key={contact._id}
-                  onClick={() => setSelectedChat(contact)}
+                  onClick={() => handleSelectChat(contact)}
                   className={`p-3 rounded-2xl flex items-center justify-between cursor-pointer transition ${
                     selectedChat?._id === contact._id 
                       ? 'bg-emerald-500/10 border border-emerald-500/20' 
@@ -279,10 +296,14 @@ function ChatDashboard({ user, onLogout }) {
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="relative">
-                      <div className={`w-11 h-11 rounded-2xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border ${
+                      <div className={`w-11 h-11 rounded-2xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border overflow-hidden ${
                         isDarkMode ? 'from-slate-800 to-slate-700 border-slate-700' : 'from-slate-100 to-slate-200 border-slate-300'
                       }`}>
-                        {contact.name.charAt(0).toUpperCase()}
+                        {contact.avatar ? (
+                          <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover" />
+                        ) : (
+                          contact.name.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
                     </div>
@@ -307,7 +328,7 @@ function ChatDashboard({ user, onLogout }) {
 
           {selectedChat ? (
             <>
-              {/* Chat Header - Fixed z-index & overflow to avoid overlap */}
+              {/* Chat Header */}
               <div className={`h-16 border-b px-4 md:px-6 flex items-center justify-between relative z-30 backdrop-blur-xl transition-colors duration-300 ${
                 isDarkMode ? 'border-slate-800/80 bg-slate-950/80' : 'border-slate-200 bg-white/90'
               }`}>
@@ -322,10 +343,14 @@ function ChatDashboard({ user, onLogout }) {
                   </button>
 
                   <div className="relative">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border ${
+                    <div className={`w-10 h-10 rounded-2xl bg-gradient-to-tr flex items-center justify-center font-bold text-emerald-500 border overflow-hidden ${
                       isDarkMode ? 'from-slate-800 to-slate-700 border-slate-700' : 'from-slate-100 to-slate-200 border-slate-300'
                     }`}>
-                      {selectedChat.name.charAt(0).toUpperCase()}
+                      {selectedChat.avatar ? (
+                        <img src={selectedChat.avatar} alt={selectedChat.name} className="w-full h-full object-cover" />
+                      ) : (
+                        selectedChat.name.charAt(0).toUpperCase()
+                      )}
                     </div>
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
                   </div>
@@ -343,7 +368,7 @@ function ChatDashboard({ user, onLogout }) {
                     <Video className="w-4 h-4" />
                   </button>
                   
-                  {/* Chat 3-dots Menu with Proper Dropdown Placement */}
+                  {/* Chat 3-dots Menu */}
                   <div className="relative">
                     <button 
                       onClick={() => setShowChatMenu(!showChatMenu)}
