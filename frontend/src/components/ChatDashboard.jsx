@@ -10,6 +10,11 @@ import BottomNav from './BottomNav';
 import AddContactModal from './AddContactModal';
 import { useTheme } from '../context/ThemeContext';
 import API from '../services/Axios';
+import {io} from 'socket.io-client'
+
+const socket = io(import.meta.env.VITE_BACKEND_BASE_URL,{
+  withCredentials:true
+})
 
 function ChatDashboard({ user, onLogout }) {
   const navigate = useNavigate();
@@ -41,10 +46,7 @@ function ChatDashboard({ user, onLogout }) {
     fetchContacts();
   }, []);
 
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'them', text: 'Hey Pintu! Kaise ho? ChatWave ka frontend kaisa chal raha hai?', time: '10:30 AM' },
-    { id: 2, sender: 'me', text: 'Ekdum mast chal raha hai! Ekdum professional look aa raha hai.', time: '10:32 AM' }
-  ]);
+  const [messages, setMessages] = useState([]);
 
   // Contact select karne par chat/messages fetch karne ka function
   const handleSelectChat = async (contact) => {
@@ -59,6 +61,17 @@ function ChatDashboard({ user, onLogout }) {
     }
   };
 
+
+  useEffect(()=>{
+    socket.on('receive_message',(data)=>{
+      setMessages((prevMessages)=>[...prevMessages,data])
+    })
+
+    return()=>{
+      socket.off('receive_message')
+    }
+  },[])
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!messageText.trim() && !selectedFile) return;
@@ -69,6 +82,8 @@ function ChatDashboard({ user, onLogout }) {
       text: messageText + (selectedFile ? ` [Attached: ${selectedFile.name}]` : ''),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
+
+    socket.emit('send_message',newMessage)
 
     setMessages([...messages, newMessage]);
     setMessageText('');
