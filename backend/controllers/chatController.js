@@ -137,3 +137,27 @@ export const sendMessage = async(req, res) => {
         })
     }
 }
+
+export const getMessage = async (req,res) => {
+    try {
+        const {id:userToChatId} = req.params
+        const myId = req.user.id
+
+        const messages = await messageModel.find({
+            $or:[
+                {sender:myId,receiver:userToChatId},
+                {sender:userToChatId,receiver:myId}
+            ]
+        }).sort({createdAt:-1})
+
+        res.status(200).json({
+            message:'Messages fetched successfully',
+            messages
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:'failed to fetch messages!!',
+            error:error.message
+        })
+    }
+}
