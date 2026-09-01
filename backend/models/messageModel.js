@@ -19,6 +19,14 @@ const messageSchema = new mongoose.Schema({
         type:String,
         default:""
     },
+    file:{              // <-- Yeh field add karni zaroori hai
+        type:String,
+        default:""
+    },
+    fileName:{        // <-- Yeh field add kar dein asli naam save karne ke liye
+        type:String,
+        default:""
+    },
     messageType:{
         type:String,
         enum:['text','image','file'],

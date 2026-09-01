@@ -10,18 +10,28 @@ cloudinary.config({
     api_secret:process.env.CLOUDINARY_API_SECRET
 })
 
-export const uploadToCloudinary = (fileBuffer) =>{
-    return new Promise((resolve,reject)=>{
+export const uploadToCloudinary = (fileBuffer, mimeType, originalName) => {
+    return new Promise((resolve, reject) => {
+        let uploadOptions = {
+            folder: "chatwave_profiles",
+            resource_type: "auto",
+        };
+
+        // Agar PDF file hai, toh resource_type raw rakhein taaki upload fail na ho
+        if (mimeType === "application/pdf" || mimeType?.includes("pdf")) {
+            uploadOptions.resource_type = "raw";
+        }
+
         let stream = cloudinary.uploader.upload_stream(
-            {folder:"chatwave_profiles"},
-            (error,result)=>{
-                if(result){
-                    resolve(result)
-                }else{
-                    reject(error)
+            uploadOptions,
+            (error, result) => {
+                if (result) {
+                    resolve(result);
+                } else {
+                    reject(error);
                 }
             }
-        )
-        streamifier.createReadStream(fileBuffer).pipe(stream)
-    })
+        );
+        streamifier.createReadStream(fileBuffer).pipe(stream);
+    });
 }

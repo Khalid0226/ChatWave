@@ -1,5 +1,6 @@
 import userModel from "../models/userModel.js";
 import messageModel from "../models/messageModel.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 export const addContact = async (req, res) => {
     try {
@@ -102,41 +103,61 @@ export const removeContacts = async (req, res) => {
     }
 }
 
-export const sendMessage = async(req, res) => {
+export const sendMessage = async (req, res) => {
     try {
-        const { receiverId, text, image, file, messageType } = req.body
+        const { receiverId, text, messageType } = req.body;
+        const senderId = req.user.id;
 
-        const senderId = req.user.id
-
-        if (!receiverId || (!text && !image && !file)) {
+        // Agar na toh text hai aur na hi koi file/image aayi hai, tab 400 error do
+        if (!receiverId || (!text && !req.file)) {
             return res.status(400).json({
-                message: 'Receiver aur message content (text, image ya file) hona zaroori hai!'
+                message: 'Receiver aur message content (text ya file/image) hona zaroori hai!'
             });
+        }
+
+        let fileUrl = "";
+        let originalFileName = ""; // <--- Yeh variable banayein
+        let type = messageType || "text";
+
+        // Agar multer ke through file aayi hai, toh use Cloudinary par upload karein
+        if (req.file) {
+            const cloudinaryResult = await uploadToCloudinary(req.file.buffer, req.file.mimetype, req.file.originalname);
+            fileUrl = cloudinaryResult.secure_url;
+            originalFileName = req.file.originalname; // <--- Original file name yahan capture karein
+            
+            // Determine karein ki wo image hai ya koi aur file
+            if (req.file.mimetype.startsWith('image/')) {
+                type = 'image';
+            } else {
+                type = 'file';
+            }
         }
 
         const newMessage = await messageModel.create({
             sender: senderId,
             receiver: receiverId,
             text: text || "",
-            image: image || "",
-            file: file || "",
-            messageType: messageType || (file ? 'file' : image ? 'image' : "text")
-        })
+            image: type === 'image' ? fileUrl : "",
+            file: type === 'file' ? fileUrl : "",
+            fileName: type === 'file' ? originalFileName : "", // <--- Database me save karein
+            messageType: type
+        });
 
-        const io = req.app.get('io')
-        io.emit('receive_message',newMessage)
+        const io = req.app.get('io');
+        io.emit('receive_message', newMessage);
 
         res.status(201).json({
-            message:'message sent successfully!!',
+            message: 'message sent successfully!!',
             newMessage
-        })
+        });
     } catch (error) {
+        console.error("Error sending message:", error);
         res.status(500).json({
-            message:'failed to send message!!',
-            error
-        })
+            message: 'failed to send message!!',
+            error: error.message
+        });
     }
-}
+};
 
 export const getMessage = async (req,res) => {
     try {
@@ -148,7 +169,7 @@ export const getMessage = async (req,res) => {
                 {sender:myId,receiver:userToChatId},
                 {sender:userToChatId,receiver:myId}
             ]
-        }).sort({createdAt:-1})
+        }).sort({createdAt:1})
 
         res.status(200).json({
             message:'Messages fetched successfully',
