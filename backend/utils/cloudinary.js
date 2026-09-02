@@ -17,9 +17,10 @@ export const uploadToCloudinary = (fileBuffer, mimeType, originalName) => {
             resource_type: "auto",
         };
 
-        // Agar PDF file hai, toh resource_type raw rakhein taaki upload fail na ho
+        // Agar PDF hai, toh resource_type ko "image" rakhein taaki Cloudinary ka viewer use support kare
         if (mimeType === "application/pdf" || mimeType?.includes("pdf")) {
-            uploadOptions.resource_type = "raw";
+            uploadOptions.resource_type = "image";
+            uploadOptions.format = "pdf"; // Ensure kare ki format pdf rahe
         }
 
         let stream = cloudinary.uploader.upload_stream(

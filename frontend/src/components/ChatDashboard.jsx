@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   MessageSquare, Search, Send, Phone, Video, MoreVertical,
   Smile, Paperclip, CheckCheck, LogOut, ArrowLeft, X,
-  CircleDot, Users, Settings, User, UserPlus, Trash2
+  CircleDot, Users, Settings, User, UserPlus, Trash2, ExternalLink
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 import BottomNav from './BottomNav';
@@ -298,8 +298,8 @@ function ChatDashboard({ user, onLogout }) {
                 type="text"
                 placeholder="Search contacts"
                 className={`w-full border rounded-xl px-4 py-2 pl-9 text-xs placeholder-slate-400 focus:outline-none transition ${isDarkMode
-                    ? 'bg-slate-950/60 border-slate-800/80 focus:border-emerald-500/80 text-white'
-                    : 'bg-white border-slate-200 focus:border-emerald-500 text-slate-900 shadow-sm'
+                  ? 'bg-slate-950/60 border-slate-800/80 focus:border-emerald-500/80 text-white'
+                  : 'bg-white border-slate-200 focus:border-emerald-500 text-slate-900 shadow-sm'
                   }`}
               />
             </div>
@@ -317,8 +317,8 @@ function ChatDashboard({ user, onLogout }) {
                   key={contact._id}
                   onClick={() => handleSelectChat(contact)}
                   className={`p-3 rounded-2xl flex items-center justify-between cursor-pointer transition ${selectedChat?._id === contact._id
-                      ? 'bg-emerald-500/10 border border-emerald-500/20'
-                      : isDarkMode ? 'hover:bg-slate-800/30 border border-transparent' : 'hover:bg-slate-100 border border-transparent'
+                    ? 'bg-emerald-500/10 border border-emerald-500/20'
+                    : isDarkMode ? 'hover:bg-slate-800/30 border border-transparent' : 'hover:bg-slate-100 border border-transparent'
                     }`}
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -422,15 +422,12 @@ function ChatDashboard({ user, onLogout }) {
                   const currentUserId = user?._id || user?.id;
                   const isMe = senderId === currentUserId || senderId === 'me';
 
-                  // FIX: Backend se jo bhi URL aaye (chahe msg.file ho ya msg.image) usko seedha yahan uthao
                   let rawFileUrl = msg.file || msg.image || "";
 
-                  // Agar url HTTP se start nahi hota tabhi base url jodo, warna direct Cloudinary URL use karo
                   const fileUrl = rawFileUrl.trim() !== ""
                     ? (rawFileUrl.startsWith('http') ? rawFileUrl : `${import.meta.env.VITE_BACKEND_BASE_URL}/${rawFileUrl.replace(/^\/+/, '')}`)
                     : null;
 
-                  // Check karein ki wo image hai ya nahi (messageType ya file extension ke base par)
                   const isImage = msg.messageType === 'image' || (fileUrl && /\.(jpeg|jpg|png|gif|webp|svg)$/i.test(fileUrl));
 
                   return (
@@ -439,10 +436,10 @@ function ChatDashboard({ user, onLogout }) {
                       className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
                     >
                       <div className={`max-w-[80%] md:max-w-md px-4 py-3 rounded-2xl text-xs leading-relaxed ${isMe
-                          ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-slate-950 font-medium rounded-br-none shadow-lg shadow-emerald-500/10'
-                          : isDarkMode
-                            ? 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none'
-                            : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-sm'
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-slate-950 font-medium rounded-br-none shadow-lg shadow-emerald-500/10'
+                        : isDarkMode
+                          ? 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none'
+                          : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-sm'
                         }`}>
 
                         {/* File / Image Rendering */}
@@ -456,17 +453,34 @@ function ChatDashboard({ user, onLogout }) {
                                 onClick={() => window.open(fileUrl, '_blank')}
                               />
                             ) : (
-                              <a
-                                href={fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="underline font-semibold flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-black/10 dark:bg-white/10"
-                              >
-                                <Paperclip className="w-4 h-4 shrink-0" />
-                                <span className="truncate max-w-[180px]">
-                                  {fileUrl.split('/').pop() || "View Document"}
-                                </span>
-                              </a>
+                              <div className="flex flex-col gap-1.5">
+                                <a
+                                  href={fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline font-semibold flex items-center justify-between gap-2 py-2 px-3 rounded-xl bg-black/10 dark:bg-white/10 hover:opacity-90 transition"
+                                >
+                                  <div className="flex items-center gap-2 truncate">
+                                    <Paperclip className="w-4 h-4 shrink-0" />
+                                    <span className="truncate max-w-[160px]">
+                                      {msg.fileName || fileUrl.split('/').pop().split('?')[0] || "View Document"}
+                                    </span>
+                                  </div>
+                                  <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                                </a>
+
+                                <div className="flex justify-end">
+                                  <a
+                                    href={fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download
+                                    className="text-[10px] opacity-80 hover:opacity-100 underline px-1"
+                                  >
+                                    Download File
+                                  </a>
+                                </div>
+                              </div>
                             )}
                           </div>
                         )}
@@ -513,8 +527,8 @@ function ChatDashboard({ user, onLogout }) {
 
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-3">
                   <div className={`flex-1 relative flex items-center border rounded-xl px-3 transition ${isDarkMode
-                      ? 'bg-slate-900/80 border-slate-800 focus-within:border-emerald-500/80'
-                      : 'bg-white border-slate-300 focus-within:border-emerald-500 shadow-sm'
+                    ? 'bg-slate-900/80 border-slate-800 focus-within:border-emerald-500/80'
+                    : 'bg-white border-slate-300 focus-within:border-emerald-500 shadow-sm'
                     }`}>
                     <button
                       type="button"
